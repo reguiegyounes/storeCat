@@ -2,9 +2,11 @@ import {BrowserRouter as Router,Route ,Link} from 'react-router-dom';
 
 import './App.css';
 // pages
-import Home from './pages/Home';
-import Products from './pages/Products';
-import Cart from './pages/Cart';
+import HomePage from './pages/HomePage';
+import ProductsPage from './pages/ProductsPage';
+import CartPage from './pages/CartPage';
+import ProductPage from './pages/ProductPage';
+import products from './api/products';
 //
 
 function App() {
@@ -32,9 +34,10 @@ function App() {
           </div>
         </nav>
         
-        <Route  path='/' component={Home}  exact />
-        <Route  path='/products' component={Products}   />
-        <Route  path='/cart' component={Cart}   />
+        <Route  path='/' component={HomePage}  exact />
+        <Route  path='/products' component={ProductsPage}  exact />
+        <Route  path='/cart' component={CartPage}   />
+        <Route  path='/products/:id' component={ProductPage}   />
     </div>
     </Router>
     
