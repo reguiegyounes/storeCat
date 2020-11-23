@@ -24,7 +24,7 @@ export default class ProductsPage extends Component{
                 <div className="row">
                     {
                         this.state.products.map( product =>
-                            <div className="col-4" key={product.id}>
+                            <div className="col-sm-4 d-flex pb-3"  key={product.id}>
                                 <ProductItem product={product}/>
                             </div>
                         )

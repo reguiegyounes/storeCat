@@ -17,22 +17,23 @@ export default class ProductPage extends Component{
                     ...this.state,
                     product:product,
                     loading:false
-                })
+                });
                 console.log({product});
             }
         );
     }
     changeQuantity=(event)=> {
         const val=event.target.value;
-        if(val==NaN) {
+        if(val=="") {
+            event.target.value='0';
             this.setState({
                 quantity: 0
-            })
+            });
         }
         else{
             this.setState({
                 quantity: parseInt(val)
-            })
+            });
         }
        
         
