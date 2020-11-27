@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import {GetById as getById} from '../api/products'
+import {addToCart,changeQuantity} from '../store/actions/actions'
+import {connect} from 'react-redux'
 
 
-export default class ProductPage extends Component{
+class ProductPage extends Component{
 
     state = {
         product:{},
@@ -24,7 +26,7 @@ export default class ProductPage extends Component{
     }
     changeQuantity=(event)=> {
         const val=event.target.value;
-        if(val=="") {
+        if(val==="") {
             event.target.value='0';
             this.setState({
                 quantity: 0
@@ -36,6 +38,32 @@ export default class ProductPage extends Component{
             });
         }
        
+        
+    }
+    btnAddToCart= (product)=>{
+
+        if(this.state.quantity===0)return;
+
+        var isChangeQuantity=true;
+        const Count=this.props.cartItems.reduce(
+            (count,item)=> {
+                if(product.id===item.product.id){
+                    count++;
+                    if(item.quantity===this.state.quantity){
+                        isChangeQuantity=false;
+                    }
+                }
+                return count;
+            },0
+        )
+        if(Count===0){
+            this.props.addToCart(product,this.state.quantity);
+        }
+        else{
+            if (isChangeQuantity) {
+                this.props.changeQuantity(product,this.state.quantity);
+            }
+        }
         
     }
     render(){
@@ -59,10 +87,26 @@ export default class ProductPage extends Component{
                         <input type="number" min="0" defaultValue={quantity} onChange={this.changeQuantity}/>
                         <br/><br/>
                         <p>Total : {quantity * product.price}$</p>
-                        <button className="btn btn-primary">Add to cart</button>
+                        <button className="btn btn-primary" onClick={()=>this.btnAddToCart(product)}>Add to cart</button>
                     </div>
                </div>
             </div>
         );
     }
 }
+
+
+const mapStateToProps=(state)=>{
+    return {
+        cartItems:state.cart,
+        total:state.cart.reduce(
+            (total,item)=> total+(item.quantity*item.product.price) ,
+            0
+        )
+        ,
+        getState:state
+    }
+}
+
+
+export default connect(mapStateToProps,{addToCart,changeQuantity})(ProductPage);
