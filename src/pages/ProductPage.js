@@ -1,10 +1,10 @@
-import React, { Component } from "react";
+import React, {Component, useState,useEffect } from "react";
 import {GetById as getById} from '../api/products'
 import {addToCart,changeQuantity} from '../store/actions/actions'
 import {connect} from 'react-redux'
 
 
-class ProductPage extends Component{
+/*class ProductPage extends Component{
 
     state = {
         product:{},
@@ -24,7 +24,7 @@ class ProductPage extends Component{
             }
         );
     }
-    changeQuantity=(event)=> {
+    handledQuantity=(event)=> {
         const val=event.target.value;
         if(val==="") {
             event.target.value='0';
@@ -84,7 +84,7 @@ class ProductPage extends Component{
                         <p>Price: {product.price}$</p>
                         <p>{product.description}</p>
                         <br/><br/>
-                        <input type="number" min="0" defaultValue={quantity} onChange={this.changeQuantity}/>
+                        <input type="number" min="0" defaultValue={quantity} onChange={this.handledQuantity}/>
                         <br/><br/>
                         <p>Total : {quantity * product.price}$</p>
                         <button className="btn btn-primary" onClick={()=>this.btnAddToCart(product)}>Add to cart</button>
@@ -93,18 +93,92 @@ class ProductPage extends Component{
             </div>
         );
     }
+}*/
+
+function ProductPage(props){
+
+    const [product,setProduct]=useState({});
+    const [loading,setLoading]=useState(true);
+    const [quantity,setQuantity]=useState(0);
+
+    useEffect(() => {
+        const id=props.match.params.id;
+        getById(parseInt(id)).then(
+            product => {
+                setProduct(product);
+                setLoading(false);
+                console.log(product);
+            }
+        );
+    }, [])
+   
+    function handledQuantity(event){
+        const val=event.target.value;
+        if(val==="") {
+            event.target.value='0';
+            setQuantity(0);
+        }
+        else{
+            setQuantity(parseInt(val))
+        }
+    }
+
+    function btnAddToCart(product){
+
+        if(quantity===0)return;
+
+        var isChangeQuantity=true;
+        const Count=props.cartItems.reduce(
+            (count,item)=> {
+                if(product.id===item.product.id){
+                    count++;
+                    if(item.quantity===quantity){
+                        isChangeQuantity=false;
+                    }
+                }
+                return count;
+            },0
+        )
+        if(Count===0){
+            props.addToCart(product,quantity);
+        }
+        else{
+            if (isChangeQuantity) {
+                props.changeQuantity(product,quantity);
+            }
+        }
+        
+    }
+    
+    if(loading){
+        return 'Loading ...'
+    }
+    else{
+        return (
+            <div>
+                <div className="row">
+                    <div className="col-6">
+                        <img src={product.image} width="100%" alt={product.name}/>
+                    </div>
+                    <div className="col-6">
+                        <h1>{product.name}</h1>
+                        <p>Price: {product.price}$</p>
+                        <p>{product.description}</p>
+                        <br/><br/>
+                        <input type="number" min="0" defaultValue={quantity} onChange={handledQuantity}/>
+                        <br/><br/>
+                        <p>Total : {quantity * product.price}$</p>
+                        <button className="btn btn-primary" onClick={()=>btnAddToCart(product)}>Add to cart</button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 }
 
-
-const mapStateToProps=(state)=>{
+function mapStateToProps(state){
     return {
-        cartItems:state.cart,
-        total:state.cart.reduce(
-            (total,item)=> total+(item.quantity*item.product.price) ,
-            0
-        )
-        ,
-        getState:state
+        cartItems:state.cart
     }
 }
 

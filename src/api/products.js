@@ -9,6 +9,3 @@ export function GetById(id) {
     return Promise.resolve(product);
 }
 
-export default{
-    GetAll,GetById
-}
